@@ -1,0 +1,26 @@
+---
+- name: Another network playbook example
+  hosts: ~^arista
+  gather_facts: no 
+
+  vars:
+          switchint: 15
+          switchver: "4.17"
+
+  tasks: 
+        - name: Harvest Arista facts
+          eos_facts:
+          when: ansible_network_os == 'eos'
+        - name: push to the local system
+          copy:
+                  content: "{{ ansible_facts | to_nice_json  }}"
+                  dest: "/home/student/mycode/roledev/{{ inventory_hostname }}.txt"
+          tags:
+                  - never
+                  - grabfacts
+        - fail:
+                msg: "Fail. Network device lacks the correct number of interfaces."
+          when: ansible_facts.net_interfaces|length != switchint
+        - fail:
+                msg:  " Fail network device is running wrong firmware"
+          when: "switchver not in ansible_facts.net_version"

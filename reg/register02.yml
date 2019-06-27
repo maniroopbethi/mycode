@@ -1,0 +1,19 @@
+---
+- name: play - another register example
+  hosts: planet-express
+  gather_facts: true
+
+  tasks:
+          - name: reachout with geturl to random generation
+            get_url:
+                    url: https://www.random.org/integers/?num=1&min=0&max=1&col=1&base=10&format=plain&rnd=new
+                    dest: ~/rand.txt
+                    force: yes
+
+          - name: read the rand.txt and save results in randvarz
+            command: cat ~/rand.txt
+            register: randvarz
+
+          - name: "debug -display the returned values"
+            debug:
+                    msg: " The value returned to anisble was : {{ randvarz.stdout  }}"
